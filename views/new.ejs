@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>새 게시물 작성</title>
+</head>
+
+<body>
+    <h1>새 게시물 작성</h1>
+    <form method="POST" action="/posts">
+        <label>
+            제목:
+            <input type="text" name="title" required />
+        </label>
+        <br />
+        <label>
+            내용:
+            <textarea name="content" required></textarea>
+        </label>
+        <br />
+        <input type="hidden" name="author" value="<%= author %>" />
+        <button type="submit">게시</button>
+        <a href="/">취소</a>
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 수정</title>
+</head>
+
+<body>
+    <h1>게시글 수정</h1>
+    <form method="POST" action="/posts/<%= post.id %>?_method=PUT">
+        <label>
+            변경할 제목:
+            <input type="text" name="title" value="<%= post.title %>" required />
+        </label>
+        <br />
+        <label>
+            변경 내용:
+            <textarea name="content" required><%= post.content %></textarea>
+        </label>
+        <br />
+        <input type="hidden" name="author" value="<%= post.author %>" />
+        <button type="submit">제출</button>
+        <a href="/posts/<%= post.id %>">취소</a>
+    </form>
+</body>
+
+</html>

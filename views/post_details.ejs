@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세보기</title>
+</head>
+
+<body>
+    <h1>게시글 상세보기</h1>
+    <div>
+        <h2>제목: <%= post.title %>
+        </h2>
+        <p>작성자: <%= post.author %>
+        </p>
+        <p>추천수: <span id="likeCount">
+                <%= post.likes %>
+            </span></p>
+        <p>댓글수: <%= post.comments %>
+        </p>
+        <p>게시글 내용: <%= post.content %>
+        </p>
+        <p>작성 시간: <%= post.created_at %>
+        </p>
+        <a href="/posts/<%= post.id %>/edit">편집</a>
+        <form method="POST" action="/posts/<%= post.id %>?_method=DELETE" style="display: inline;">
+            <button type="submit">삭제</button>
+        </form>
+    </div>
+
+    <div>
+        <h3>추천</h3>
+        <button id="likeButton" <%=post.liked ? 'disabled' : '' %>>추천</button>
+    </div>
+
+    <div>
+        <h3>댓글 추가</h3>
+        <form id="commentForm" method="POST" action="/comments/<%= post.id %>">
+            <label for="comment">댓글:</label><br>
+            <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+            <button id="commentButton" type="submit" disabled>댓글 작성</button>
+        </form>
+    </div>
+
+    <div>
+        <h3>댓글 목록</h3>
+        <ul>
+            <% comments.forEach(comment=> { %>
+                <li>
+                    <p>작성자: <%= comment.author %>
+                    </p>
+                    <p>댓글: <%= comment.content %>
+                    </p>
+                    <p>작성일: <%= comment.createdAt %>
+                    </p>
+                </li>
+                <% }) %>
+        </ul>
+    </div>
+
+    <script>
+        const commentTextarea = document.getElementById('comment');
+        const commentButton = document.getElementById('commentButton');
+        const likeButton = document.getElementById('likeButton');
+        const likeCount = document.getElementById('likeCount');
+
+        commentTextarea.addEventListener('input', function () {
+            commentButton.disabled = !this.value.trim();
+        });
+
+        let isLikeRequestPending = false;
+
+        likeButton.addEventListener('click', async function () {
+            if (isLikeRequestPending) {
+                return;
+            }
+
+            isLikeRequestPending = true;
+            likeButton.disabled = true;
+
+            try {
+                const response = await fetch(`/likes/<%= post.id %>`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const { likes } = await response.json();
+                    likeCount.textContent = likes;
+                } else {
+                    throw new Error('Failed to like post');
+                }
+            } catch (error) {
+                console.error('Error liking post:', error);
+            } finally {
+                isLikeRequestPending = false;
+                likeButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

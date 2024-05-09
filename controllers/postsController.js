@@ -1,7 +1,7 @@
 const pool = require('../db');
 
 exports.getPosts = async (req, res) => {
-    const [rows] = await pool.query('SELECT * FROM posts');
+    const [rows] = await pool.query('SELECT * FROM posts ORDER BY id');
     res.render('posts', { posts: rows });
 };
 
@@ -14,6 +14,7 @@ exports.createPost = async (req, res) => {
     const { title, content } = req.body;
     const author = req.user ? req.user.username : 'Anonymous';
     const [result] = await pool.query('INSERT INTO posts (title, content, author) VALUES (?, ?, ?)', [title, content, author]);
+    await pool.query('ALTER TABLE posts AUTO_INCREMENT = 1');
     res.redirect('/posts');
 };
 
@@ -34,13 +35,13 @@ exports.updatePost = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
     await pool.query('DELETE FROM posts WHERE id = ?', [req.params.id]);
+    await pool.query('ALTER TABLE posts AUTO_INCREMENT = 1');
     res.redirect('/posts');
 };
 
 exports.getPostDetails = async (req, res) => {
     const postId = req.params.id;
     const [postRows] = await pool.query('SELECT * FROM posts WHERE id = ?', [postId]);
-
     if (postRows.length === 0) {
         res.status(404).send('Post not found');
     } else {

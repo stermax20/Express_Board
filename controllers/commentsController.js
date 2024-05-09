@@ -3,10 +3,11 @@ const pool = require('../db');
 exports.addComment = async (req, res) => {
     const postId = req.params.postId;
     const { comment } = req.body;
+    const author = req.user ? req.user.username : 'Anonymous';
 
     try {
         await pool.query('UPDATE posts SET comments = comments + 1 WHERE id = ?', [postId]);
-        await pool.query('INSERT INTO comments (post_id, comment) VALUES (?, ?)', [postId, comment]);
+        await pool.query('INSERT INTO comments (post_id, comment, author) VALUES (?, ?, ?)', [postId, comment, author]);
         res.redirect(`/posts/${postId}`);
     } catch (error) {
         console.error('Error adding comment:', error);
@@ -64,13 +65,13 @@ exports.getPostDetails = async (req, res) => {
         res.status(404).send('Post not found');
     } else {
         const post = postRows[0];
-        const [commentRows] = await pool.query('SELECT c.id, c.username, c.comment, c.created_at FROM comments c WHERE c.post_id = ?', [postId]);
+        const [commentRows] = await pool.query('SELECT c.id, c.author, c.comment, c.created_at FROM comments c WHERE c.post_id = ?', [postId]);
         const comments = await Promise.all(commentRows.map(async row => {
             const [replyRows] = await pool.query('SELECT reply, created_at FROM replies WHERE comment_id = ?', [row.id]);
             const replies = replyRows.map(replyRow => ({ content: replyRow.reply, createdAt: replyRow.created_at }));
             return {
                 id: row.id,
-                author: row.username,
+                author: row.author,
                 content: row.comment,
                 createdAt: row.created_at,
                 replies

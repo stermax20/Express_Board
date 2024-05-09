@@ -45,9 +45,9 @@ exports.getPostDetails = async (req, res) => {
         res.status(404).send('Post not found');
     } else {
         const post = postRows[0];
-        const [commentRows] = await pool.query('SELECT username, comment, created_at FROM comments WHERE post_id = ?', [postId]);
+        const [commentRows] = await pool.query('SELECT author, comment, created_at FROM comments WHERE post_id = ?', [postId]);
         const comments = commentRows.map(row => ({
-            author: row.username,
+            author: row.author,
             content: row.comment,
             createdAt: row.created_at
         }));

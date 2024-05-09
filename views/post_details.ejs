@@ -21,9 +21,15 @@
         </p>
         <p>게시글 내용: <%= post.content %>
         </p>
-        <p>작성 시간: <%= post.created_at %>
+        <p>작성 시간:
+            <% if (post.created_at) { %>
+                <%= post.created_at.toLocaleString() %>
+                    <% } else { %>
+                        -
+                        <% } %>
         </p>
         <a href="/posts/<%= post.id %>/edit">편집</a>
+        <a href="/posts">뒤로가기</a>
         <form method="POST" action="/posts/<%= post.id %>?_method=DELETE" style="display: inline;">
             <button type="submit">삭제</button>
         </form>
@@ -52,7 +58,12 @@
                     </p>
                     <p>댓글: <%= comment.content %>
                     </p>
-                    <p>작성일: <%= comment.createdAt %>
+                    <p>작성일:
+                        <% if (comment.createdAt) { %>
+                            <%= comment.createdAt.toLocaleString() %>
+                                <% } else { %>
+                                    -
+                                    <% } %>
                     </p>
                 </li>
                 <% }) %>
